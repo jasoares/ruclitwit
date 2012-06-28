@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+# Initial code inspired by:
+# http://www.noppanit.com/ruby-command-line-twitter-client-made-easy/
+
+require 'rubygems'
+require 'twitter'
+
+Twitter.configure do |config|
+  config.consumer_key = 'Your Consumer Key'
+  config.consumer_secret = 'Your Consumer Secret'
+  config.oauth_token = 'Your Access Token'
+  config.oauth_token_secret = 'Your Access Token Secret'
+end
+
+
+case ARGV[0]
+  when "-t"
+    timeline = Twitter.home_timeline.reverse
+    timeline.each do |tweet|
+      puts tweet.text + " from \033[36m#{tweet.user.screen_name}\033[0m"
+    end
+  when "-u"
+    if ARGV[1].nil?
+      puts "Status:"
+      status = STDIN.readline.chomp
+      Twitter.update("#{status}")
+    else
+      Twitter.update("#{ARGV[1]}")
+    end
+  when "-m"
+    mentions = Twitter.mentions.reverse
+    mentions.each do |tweet|
+      puts tweet.text + " from \033[36m#{tweet.user.screen_name}\033[0m"
+    end
+  else
+    puts "-t\ttimeline\n-u\tupdate status\n-m\tmentions"
+end
